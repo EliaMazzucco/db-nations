@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public class Main {
 
@@ -15,14 +16,22 @@ public class Main {
 	public static void main(String[] args) {
 
 		try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD)) {
-
-			System.out.println(con.isClosed());
+			Scanner scan = new Scanner(System.in);
+			System.out.println("Insert a key word for found the country: ");
+			String filtro = scan.nextLine();
+			
 
 			String sql = "select c.name as country_name, c.country_id, r.name as region_name, c2.name as continents_name from countries c \r\n"
 					+ "join regions r on c.region_id = r.region_id \r\n"
-					+ "join continents c2 on c2.continent_id = r.continent_id \r\n" + "order by c.name;";
+					+ "join continents c2 on c2.continent_id = r.continent_id \r\n"
+					+ "where c.name like ? \r\n"
+					+ "order by c.name;\r\n"
+					+ "\r\n";
+									
+		
 
-			try (PreparedStatement ps = con.prepareStatement(sql)) {				
+			try (PreparedStatement ps = con.prepareStatement(sql)) {		
+				ps.setString(1, "%" + filtro + "%");
 				
 
 				try (ResultSet rs = ps.executeQuery()) {
